@@ -57,6 +57,24 @@
 #     
 #     - test the algorithm on the test set using the predict function
 
+require(readr)
+require(ggplot2)
+require(dplyr)
+
+## Uploading the data set and cleaning
+training <- read_csv("pml-training.csv")
+testing <- read_csv("pml-testing.csv")
+
+testing <- testing[,colSums(is.na(testing)) < nrow(testing)]
+testingColNames <- colnames(testing)
+testingColNames <- testingColNames[-length(testingColNames)]
+testingColNames <- append(testingColNames
+                          , names(training)[length(names(training))])
+colNums <- match(testingColNames, names(training))
+training <- training %>% select(colNums)
+
+## Imput the data and explore the dataset
+glimpse(training)
 
 
     
