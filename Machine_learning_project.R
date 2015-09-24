@@ -63,10 +63,14 @@ require(caret)
 require(dplyr)
 require(stringr)
 require(AppliedPredictiveModeling)
+setwd(choose.dir())
 
 ## Uploading the data set and cleaning
 training <- read_csv("pml-training.csv")
 testing <- read_csv("pml-testing.csv")
+
+## Remove the first columns
+training <- training[,-1]; testing <-testing[,-1]
 
 # if sum of NA by col is less than number of rows than keep it 
 testing <- testing[,colSums(is.na(testing)) < nrow(testing)]
@@ -86,7 +90,22 @@ glimpse(training)
 summary(training)
 
 ## look for any NA values for imputation if needed
+## Also look for near zero covariates for removal
 sum(is.na(training))
+
+## Near Zero Variance Analysis, remove new_window as it has no variance
+nzv <- nearZeroVar(training, saveMetrics=TRUE)
+nzv
+training <- select(training, -new_window)
+
+# ## Prinicpal Component analysis -- see which
+# ## variables are highly correlated with each 
+# ## other
+# temp_training <- abs(cor(training[,5:57]))
+# ## remove outcomes that are essentially variables correlated with themselves
+# diag(temp_training) <- 0 
+# which(temp_training > 0.8, arr.ind=T)
+
 
 # ## trying to vizualize data - may wait on that
 # training_col_names <- names(training)
