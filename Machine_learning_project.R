@@ -59,22 +59,47 @@
 
 require(readr)
 require(ggplot2)
+require(caret)
 require(dplyr)
+require(stringr)
+require(AppliedPredictiveModeling)
 
 ## Uploading the data set and cleaning
 training <- read_csv("pml-training.csv")
 testing <- read_csv("pml-testing.csv")
 
+# if sum of NA by col is less than number of rows than keep it 
 testing <- testing[,colSums(is.na(testing)) < nrow(testing)]
 testingColNames <- colnames(testing)
+## Remove problem_id from the testingColNames set
 testingColNames <- testingColNames[-length(testingColNames)]
+## add in the classe variable from the training set
 testingColNames <- append(testingColNames
                           , names(training)[length(names(training))])
+## Find the training columns indexes from the testingColNames
 colNums <- match(testingColNames, names(training))
+## Filter down the columns based on the values in the training set
 training <- training %>% select(colNums)
 
-## Imput the data and explore the dataset
+## Explore the dataset
 glimpse(training)
+summary(training)
+
+## look for any NA values for imputation if needed
+sum(is.na(training))
+
+# ## trying to vizualize data - may wait on that
+# training_col_names <- names(training)
+# training_gyros_data <- training %>%
+#     select(matches("gyros|classe"))
+# transparentTheme(trans = .4)
+# featurePlot(x = training_gyros_data[,1:20],
+#             y = training_gyros_data$classe,
+#             plot = "pairs")
+
+## Do preprocesing - do data transformation need to be made?
+## , use createTimeSlices. Read this further: http://topepo.github.io/caret/preprocess.html
+
 
 
     
