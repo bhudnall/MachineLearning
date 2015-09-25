@@ -119,6 +119,8 @@ training <- select(training, -new_window)
 ## Do preprocesing - do data transformation need to be made?
 ## , use createTimeSlices. Read this further: http://topepo.github.io/caret/preprocess.html
 
+## Add boxplots graphs for exploration vizualizations
+
 
 
     
