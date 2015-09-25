@@ -13,19 +13,19 @@
 #     - Predict the manner in which someone did the exercise ("classe") variable in data set
 #     - Can use any variable in the data set to predict
 #     - Describe how:
-#         - built moded - regression (REVIEW REGRESSION VIDEO AGAIN), decision tree (use the 
+#         - Build model - regression (REVIEW REGRESSION VIDEO AGAIN), decision tree (use the 
 #           rpart method in the train function), Random Forest (use method="rf" with the train
 #           function. Use fancyRPartPlot to create a good looking dendogram. Predict new values 
 #           using the predict function.
 #         
-#         - cross validation - Essentially the practice of splitting up the data set, using a 
+#         - Cross validation - Essentially the practice of splitting up the data set, using a 
 #            training set to build the model and use it on the test set, methods: K-fold? 
 #            leave one out? Use the train function to do cross validation.
 #         
-#         - what expected out of sample error is - The error rate you get on a new data set.
+#         - What expected out of sample error is - The error rate you get on a new data set.
 #           Sometimes called generalization error. So the error I'll get in the test set.
 #           In sample error is the error we get from the training set. How to calculate:
-#           Look at type of errors slides. Can caluclated it with mean squared error for
+#           Look at type of errors slides. Can be calculated with mean squared error for
 #           continuous data, or weight false positives
 #         
 #         - why made choices did
@@ -47,7 +47,7 @@
 #       (method="knnImput") values that are missing.
 #     
 #     - Create an algorithm using the train function (Decision Tree or random forest)
-#       Rnadom forest is essentially decision tree with bagging.
+#       Random forest is essentially decision tree with bagging.
 #
 #     - Test different algorithms using train and bagging (non-linear models). Potentially
 #       boost to enhance week variables.
@@ -70,7 +70,7 @@ training <- read_csv("pml-training.csv")
 testing <- read_csv("pml-testing.csv")
 
 ## Remove the first columns
-training <- training[,-1]; testing <-testing[,-1]
+training <- training[,-1]; testing <- testing[,-1]
 
 # if sum of NA by col is less than number of rows than keep it 
 testing <- testing[,colSums(is.na(testing)) < nrow(testing)]
@@ -98,7 +98,7 @@ nzv <- nearZeroVar(training, saveMetrics=TRUE)
 nzv
 training <- select(training, -new_window)
 
-# ## Prinicpal Component analysis -- see which
+# ## Principal Component analysis -- see which
 # ## variables are highly correlated with each 
 # ## other
 # temp_training <- abs(cor(training[,5:57]))
