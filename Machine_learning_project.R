@@ -62,15 +62,32 @@ require(ggplot2)
 require(caret)
 require(dplyr)
 require(stringr)
+require(rattle)
+require(rpart.plot)
+require(randomForest)
 require(AppliedPredictiveModeling)
-setwd(choose.dir())
+##setwd("/Users/brianhudnall/programming/r/machinelearning")
+
+
+## LOADING DATA
 
 ## Uploading the data set and cleaning
 training <- read_csv("pml-training.csv")
 testing <- read_csv("pml-testing.csv")
 
-## Remove the first columns
-training <- training[,-1]; testing <- testing[,-1]
+## Remove the first columns and other unecessary columns
+training <- select(training
+                   , -user_name
+                   , -cvtd_timestamp
+                   , -raw_timestamp_part_1
+                   , -raw_timestamp_part_2
+                   , -1)
+testing <- select(testing
+                  , -user_name
+                  , -cvtd_timestamp
+                  , -raw_timestamp_part_1
+                  , -raw_timestamp_part_2
+                  , -1)
 
 # if sum of NA by col is less than number of rows than keep it 
 testing <- testing[,colSums(is.na(testing)) < nrow(testing)]
@@ -83,7 +100,7 @@ testingColNames <- append(testingColNames
 ## Find the training columns indexes from the testingColNames
 colNums <- match(testingColNames, names(training))
 ## Filter down the columns based on the values in the training set
-training <- training %>% select(colNums)
+training <- select(training, colNums)
 
 ## Explore the dataset
 glimpse(training)
@@ -93,34 +110,68 @@ summary(training)
 ## Also look for near zero covariates for removal
 sum(is.na(training))
 
+## PARTITION DATA
+
+inTrain <- createDataPartition(y=training$classe,
+                               p=0.6, list=FALSE)
+training_training <- training[inTrain,]
+training_testing <- training[-inTrain,]
+dim(training_training)
+dim(training_testing)
+
+## PREPROCESSING
+
 ## Near Zero Variance Analysis, remove new_window as it has no variance
-nzv <- nearZeroVar(training, saveMetrics=TRUE)
+nzv <- nearZeroVar(training_training, saveMetrics=TRUE)
 nzv
-training <- select(training, -new_window)
+training_training <- select(training_training, -new_window)
+training_testing <- select(training_testing, -new_window)
+testing <- select(testing, -new_window)
 
-# ## Principal Component analysis -- see which
-# ## variables are highly correlated with each 
-# ## other
-# temp_training <- abs(cor(training[,5:57]))
-# ## remove outcomes that are essentially variables correlated with themselves
-# diag(temp_training) <- 0 
-# which(temp_training > 0.8, arr.ind=T)
+## Remove highly correlated predictors. First by calc a correlation matrix
+## and then removing values that are highly correlated
+descrCor <- cor(training_training[,-54])
+highCorr <- sum(abs(descrCor[upper.tri(descrCor)]) > .95)
+## There are 19 variables that are correlated higher than 80%
+## Remove them from both the training and testing sets
+highlyCorDescr <- findCorrelation(descrCor, cutoff = .95)
+training_training_filt <- training_training[,-highlyCorDescr]
+training_testing_filt <- training_testing[,-highlyCorDescr]
+testing_filt <- testing[,-highlyCorDescr]
 
+## SHOW BOXPLOT VIZ
 
-# ## trying to vizualize data - may wait on that
-# training_col_names <- names(training)
-# training_gyros_data <- training %>%
-#     select(matches("gyros|classe"))
-# transparentTheme(trans = .4)
-# featurePlot(x = training_gyros_data[,1:20],
-#             y = training_gyros_data$classe,
-#             plot = "pairs")
+## RUN DATA MODEL - remember to talk about out of sample error
+modFit <- rpart(classe ~ ., data=training_training_filt, method="class")
+fancyRpartPlot(modFit)
 
-## Do preprocesing - do data transformation need to be made?
-## , use createTimeSlices. Read this further: http://topepo.github.io/caret/preprocess.html
+training_testing_predict <- predict(modFit
+                                    , training_testing_filt
+                                    , type = "class")
 
-## Add boxplots graphs for exploration vizualizations
+confusionMatrix(training_testing_predict
+                , training_testing_filt$classe)
 
+training_training_filt$classe <- as.factor(training_training_filt$classe)
+training_testing_filt$classe <- as.factor(training_testing_filt$classe)
+
+modFit_rf <- randomForest(classe ~ ., data=training_training_filt)
+rf_predictions <- predict(modFit_rf, training_testing_filt, type = "class")
+confusionMatrix(rf_predictions, training_testing_filt$classe)
+
+final_predictions <- predict(modFit_rf, testing_filt, type = "class")
+
+## PRINT PREDICTIONS
+
+pml_write_files = function(x){
+    n = length(x)
+    for(i in 1:n){
+        filename = paste0("problem_id_",i,".txt")
+        write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
+    }
+}
+
+pml_write_files(final_predictions)
 
 
     
