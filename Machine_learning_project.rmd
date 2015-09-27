@@ -61,7 +61,7 @@ colNums <- match(testingColNames, names(training))
 training <- select(training, colNums)
 ```
 
-#### Explore, partition and pre-proces the data for model preparation:
+#### Explore, partition and pre-process the data for model preparation:
 
 Use the glimpse and summary function to look at the final sets before partitioning. Also check to make sure there are no NA values. From there, partition the data sets and have 60% of the data in the training set with 40% in the testing set. 
 Then, do a near zero variance analysis to find variables with low variance and as a result can be remved because they are not a primary predictor. Finally, do somewhat of a prinicipal component analysis and find combinations of variables that have higher than a 95% correlation -- remove these variables as they will have a similar predictor effect and are not necessary in the final model.
