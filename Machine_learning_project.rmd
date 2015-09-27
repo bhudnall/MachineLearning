@@ -2,7 +2,7 @@
 
 #### Title: Machine Learning Analysis by Brian Hudnall
 
-#### Project Summary and Goals: 6 young health participants perform one set of 10 repitions of unilateral bicep curls 5 different ways. Predict the manner in which someone did the exercise ("classe") variable in data set. Describe how to build the model, do cross validation, and what the expected out of sample error is for the final model.
+#### Project Summary and Goals: 6 young health participants perform one set of 10 repetitions of unilateral bicep curls 5 different ways. Predict the manner in which someone did the exercise ("classe") variable in data set. Describe how to build the model, do cross validation, and what the expected out of sample error is for the final model.
 
 #### Results: After doing extensive data cleaning and pre processing the final model (random forest) was able to succesfully predict how each testing set participant performed the exercise. The accuracy of the final model was 99%, so the expected out of sample error rate is extremely small.
 
